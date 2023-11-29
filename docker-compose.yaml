@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: node
+    container_name: app
+    networks:
+      - laranet
+    volumes:
+      - ./node:/usr/src/app
+    tty: true
+    ports:
+      - "3000:3000"
+  
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    volumes:
+      - ./sqlteste:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nodedb
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: L!nux123
+    ports:
+      - "3306:3306"
+    networks:
+      - laranet
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.prod
+    image: nginx:latest
+    container_name: nginx
+    networks:
+      - laranet
+    ports:
+      - "8080:80"
+      
+networks:
+    laranet:
+      driver: bridge
